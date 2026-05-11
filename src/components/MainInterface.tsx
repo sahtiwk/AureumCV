@@ -8,6 +8,7 @@ import ResultView from './ResultView';
 import ImageUploader from './ImageUploader';
 import TargetCursor from './TargetCursor';
 import DotField from './DotField';
+import LandingCards from './LandingCards';
 import { useAppStore } from '@/store/useAppStore';
 import { Camera, ScanFace, Activity, Upload } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -25,7 +26,7 @@ export default function MainInterface() {
   const isUploadMode = appState === 'UPLOAD_IDLE' || appState === 'UPLOAD_PROCESSING';
 
   return (
-    <main className="relative w-screen h-screen overflow-hidden bg-[#0a0908] font-sans">
+    <main className={`relative w-screen bg-[#0a0908] font-sans ${appState === 'IDLE' ? 'min-h-screen overflow-y-auto overflow-x-hidden' : 'h-screen overflow-hidden'}`}>
       {appState === 'IDLE' && (
         <TargetCursor 
           spinDuration={2}
@@ -120,96 +121,119 @@ export default function MainInterface() {
 
         {/* ── IDLE: Two-card Mode Selector ── */}
         {appState === 'IDLE' && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-10 pointer-events-auto px-6">
-            <div className="text-center space-y-4 mb-2">
-              <motion.h2 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="text-7xl font-light tracking-tight text-[#e8d5a3] font-display"
-              >
-                AureumCV
-              </motion.h2>
+          <>
+            {/* ── Hero Section (viewport-height) ── */}
+            <div className="relative min-h-screen flex flex-col items-center justify-center gap-10 pointer-events-auto px-6">
+              <div className="text-center space-y-4 mb-2">
+                <motion.h2 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-7xl font-light tracking-tight text-[#e8d5a3] font-display"
+                >
+                  AureumCV
+                </motion.h2>
+                <motion.p 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 }}
+                  className="text-[#e8d5a3]/40 text-lg max-w-md font-sans tracking-wide mx-auto"
+                >
+                  Advanced Facial Geometry & Phi Analysis
+                </motion.p>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-6 w-full max-w-3xl">
+                {/* Live Camera Card */}
+                <motion.button
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.2 }}
+                  whileHover={{ y: -5, boxShadow: '0 0 40px rgba(201,168,76,0.2)' }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => setWebcamActive(true)}
+                  className="flex-1 group relative bg-[#0c0a08] border border-[#c9a84c]/20 hover:border-[#c9a84c]/50 rounded-lg p-10 flex flex-col items-center gap-6 transition-all duration-500 overflow-hidden cursor-target"
+                >
+                  {/* Corner accents */}
+                  <span className="absolute top-0 left-0 w-3 h-3 border-t border-l border-[#c9a84c]/40 m-2" />
+                  <span className="absolute bottom-0 right-0 w-3 h-3 border-b border-r border-[#c9a84c]/40 m-2" />
+                  
+                  <div className="w-14 h-14 rounded-full border border-[#c9a84c]/30 flex items-center justify-center group-hover:scale-110 group-hover:border-[#c9a84c] transition-all duration-500">
+                    <Camera className="w-6 h-6 text-[#c9a84c]" />
+                  </div>
+                  <div className="text-center">
+                    <h3 className="text-[#e8d5a3] font-display text-2xl mb-2 tracking-wide">Live Stream</h3>
+                    <p className="text-[#e8d5a3]/30 text-sm font-sans leading-relaxed">
+                      Real-time 3D tracking with dynamic Phi metrics and gesture guidance.
+                    </p>
+                  </div>
+                  <div className="mt-auto pt-6">
+                    <span className="text-[10px] font-sans text-[#c9a84c] uppercase tracking-[0.25em] opacity-60 group-hover:opacity-100 transition-opacity">
+                      Access Camera
+                    </span>
+                  </div>
+                </motion.button>
+
+                {/* Upload Photo Card */}
+                <motion.button
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.3 }}
+                  whileHover={{ y: -5, boxShadow: '0 0 40px rgba(201,168,76,0.2)' }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => setAppState('UPLOAD_IDLE')}
+                  className="flex-1 group relative bg-[#0c0a08] border border-[#c9a84c]/20 hover:border-[#c9a84c]/50 rounded-lg p-10 flex flex-col items-center gap-6 transition-all duration-500 overflow-hidden cursor-target"
+                >
+                  {/* Corner accents */}
+                  <span className="absolute top-0 left-0 w-3 h-3 border-t border-l border-[#c9a84c]/40 m-2" />
+                  <span className="absolute bottom-0 right-0 w-3 h-3 border-b border-r border-[#c9a84c]/40 m-2" />
+
+                  <div className="w-14 h-14 rounded-full border border-[#c9a84c]/30 flex items-center justify-center group-hover:scale-110 group-hover:border-[#c9a84c] transition-all duration-500">
+                    <Upload className="w-6 h-6 text-[#c9a84c]" />
+                  </div>
+                  <div className="text-center">
+                    <h3 className="text-[#e8d5a3] font-display text-2xl mb-2 tracking-wide">Static Analysis</h3>
+                    <p className="text-[#e8d5a3]/30 text-sm font-sans leading-relaxed">
+                      High-fidelity proportional analysis from uploaded portrait photography.
+                    </p>
+                  </div>
+                  <div className="mt-auto pt-6">
+                    <span className="text-[10px] font-sans text-[#c9a84c] uppercase tracking-[0.25em] opacity-60 group-hover:opacity-100 transition-opacity">
+                      Upload Portrait
+                    </span>
+                  </div>
+                </motion.button>
+              </div>
+
               <motion.p 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 }}
-                className="text-[#e8d5a3]/40 text-lg max-w-md font-sans tracking-wide mx-auto"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5 }}
+                className="text-[#e8d5a3]/20 text-[10px] uppercase tracking-[0.2em] font-sans"
               >
-                Advanced Facial Geometry & Phi Analysis
+                All processing is local · Privacy First
               </motion.p>
+
+              {/* Scroll-down indicator */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.8 }}
+                className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+              >
+                <span className="text-[9px] font-sans uppercase tracking-[0.3em] text-[#c9a84c]/30">Scroll to learn more</span>
+                <motion.div
+                  animate={{ y: [0, 8, 0] }}
+                  transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
+                  className="w-5 h-8 rounded-full border border-[#c9a84c]/20 flex items-start justify-center pt-1.5"
+                >
+                  <div className="w-1 h-1.5 rounded-full bg-[#c9a84c]/50" />
+                </motion.div>
+              </motion.div>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-6 w-full max-w-3xl">
-              {/* Live Camera Card */}
-              <motion.button
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.2 }}
-                whileHover={{ y: -5, boxShadow: '0 0 40px rgba(201,168,76,0.2)' }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => setWebcamActive(true)}
-                className="flex-1 group relative bg-[#0c0a08] border border-[#c9a84c]/20 hover:border-[#c9a84c]/50 rounded-lg p-10 flex flex-col items-center gap-6 transition-all duration-500 overflow-hidden cursor-target"
-              >
-                {/* Corner accents */}
-                <span className="absolute top-0 left-0 w-3 h-3 border-t border-l border-[#c9a84c]/40 m-2" />
-                <span className="absolute bottom-0 right-0 w-3 h-3 border-b border-r border-[#c9a84c]/40 m-2" />
-                
-                <div className="w-14 h-14 rounded-full border border-[#c9a84c]/30 flex items-center justify-center group-hover:scale-110 group-hover:border-[#c9a84c] transition-all duration-500">
-                  <Camera className="w-6 h-6 text-[#c9a84c]" />
-                </div>
-                <div className="text-center">
-                  <h3 className="text-[#e8d5a3] font-display text-2xl mb-2 tracking-wide">Live Stream</h3>
-                  <p className="text-[#e8d5a3]/30 text-sm font-sans leading-relaxed">
-                    Real-time 3D tracking with dynamic Phi metrics and gesture guidance.
-                  </p>
-                </div>
-                <div className="mt-auto pt-6">
-                  <span className="text-[10px] font-sans text-[#c9a84c] uppercase tracking-[0.25em] opacity-60 group-hover:opacity-100 transition-opacity">
-                    Access Camera
-                  </span>
-                </div>
-              </motion.button>
-
-              {/* Upload Photo Card */}
-              <motion.button
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.3 }}
-                whileHover={{ y: -5, boxShadow: '0 0 40px rgba(201,168,76,0.2)' }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => setAppState('UPLOAD_IDLE')}
-                className="flex-1 group relative bg-[#0c0a08] border border-[#c9a84c]/20 hover:border-[#c9a84c]/50 rounded-lg p-10 flex flex-col items-center gap-6 transition-all duration-500 overflow-hidden cursor-target"
-              >
-                {/* Corner accents */}
-                <span className="absolute top-0 left-0 w-3 h-3 border-t border-l border-[#c9a84c]/40 m-2" />
-                <span className="absolute bottom-0 right-0 w-3 h-3 border-b border-r border-[#c9a84c]/40 m-2" />
-
-                <div className="w-14 h-14 rounded-full border border-[#c9a84c]/30 flex items-center justify-center group-hover:scale-110 group-hover:border-[#c9a84c] transition-all duration-500">
-                  <Upload className="w-6 h-6 text-[#c9a84c]" />
-                </div>
-                <div className="text-center">
-                  <h3 className="text-[#e8d5a3] font-display text-2xl mb-2 tracking-wide">Static Analysis</h3>
-                  <p className="text-[#e8d5a3]/30 text-sm font-sans leading-relaxed">
-                    High-fidelity proportional analysis from uploaded portrait photography.
-                  </p>
-                </div>
-                <div className="mt-auto pt-6">
-                  <span className="text-[10px] font-sans text-[#c9a84c] uppercase tracking-[0.25em] opacity-60 group-hover:opacity-100 transition-opacity">
-                    Upload Portrait
-                  </span>
-                </div>
-              </motion.button>
-            </div>
-
-            <motion.p 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
-              className="text-[#e8d5a3]/20 text-[10px] uppercase tracking-[0.2em] font-sans"
-            >
-              All processing is local · Privacy First
-            </motion.p>
-          </div>
+            {/* ── Educational Cards Section ── */}
+            <LandingCards />
+          </>
         )}
 
         {/* Footer Controls (live tracking only) */}
