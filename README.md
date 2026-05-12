@@ -44,8 +44,8 @@
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/symmetry-pro.git
-   cd symmetry-pro
+   git clone https://github.com/your-username/aureumcv.git
+   cd aureumcv
    ```
 
 2. Install dependencies:
