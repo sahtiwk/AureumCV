@@ -84,9 +84,9 @@ export default function TargetingReticle() {
         
         if (reticleRef.current) {
           if (isPerfect) {
-            reticleRef.current.className = "relative w-64 h-64 rounded-full border-2 transition-all duration-300 flex items-center justify-center border-[#c9a84c] scale-110 shadow-[0_0_50px_rgba(201,168,76,0.3)]";
+            reticleRef.current.className = "relative w-40 h-40 md:w-64 md:h-64 rounded-full border-2 transition-all duration-300 flex items-center justify-center border-[#c9a84c] scale-110 shadow-[0_0_50px_rgba(201,168,76,0.3)]";
           } else {
-            reticleRef.current.className = "relative w-64 h-64 rounded-full border-2 transition-all duration-300 flex items-center justify-center border-white/10";
+            reticleRef.current.className = "relative w-40 h-40 md:w-64 md:h-64 rounded-full border-2 transition-all duration-300 flex items-center justify-center border-white/10";
           }
         }
 
@@ -115,11 +115,11 @@ export default function TargetingReticle() {
   return (
     <div className="absolute inset-0 z-20 pointer-events-none flex flex-col items-center justify-center">
       {/* Reticle Circle */}
-      <div ref={reticleRef} className="relative w-64 h-64 rounded-full border-2 transition-all duration-300 flex items-center justify-center border-white/10">
+      <div ref={reticleRef} className="relative w-40 h-40 md:w-64 md:h-64 rounded-full border-2 transition-all duration-300 flex items-center justify-center border-white/10">
         
         {/* Countdown Number */}
         {countdown !== null && (
-          <span className="text-8xl font-mono text-[#e8d5a3] drop-shadow-[0_0_30px_rgba(201,168,76,0.5)] animate-pulse">
+          <span className="text-5xl md:text-8xl font-mono text-[#e8d5a3] drop-shadow-[0_0_30px_rgba(201,168,76,0.5)] animate-pulse">
             {countdown}
           </span>
         )}
@@ -130,7 +130,7 @@ export default function TargetingReticle() {
       </div>
 
       {/* Instruction Badge */}
-      <div ref={badgeRef} className="mt-8 px-8 py-3 rounded-full backdrop-blur-md border border-[#c9a84c]/10 shadow-xl transition-all bg-[#0c0a08]/60 text-[#e8d5a3]/40">
+      <div ref={badgeRef} className="mt-4 md:mt-8 px-5 md:px-8 py-2 md:py-3 rounded-full backdrop-blur-md border border-[#c9a84c]/10 shadow-xl transition-all bg-[#0c0a08]/60 text-[#e8d5a3]/40">
         <span ref={messageRef} className="font-sans text-[10px] font-medium tracking-[0.25em] uppercase whitespace-nowrap">Align Face</span>
       </div>
     </div>

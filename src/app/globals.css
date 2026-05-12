@@ -35,3 +35,11 @@ h1, h2, h3, h4, h5, h6 {
 .font-mono, .font-number {
   font-family: var(--font-mono), monospace;
 }
+
+/* ── Mobile overrides ── */
+@media (max-width: 767px) {
+  body {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+}

@@ -89,23 +89,28 @@ export default function TelemetryHUD() {
   if (appState !== 'ANALYZING') return null;
 
   return (
-    <div className="absolute top-40 left-6 z-30 pointer-events-auto flex flex-col space-y-4 font-sans">
+    <div className="
+      relative z-30 pointer-events-auto font-sans
+      px-3 pb-4 pt-2
+      flex flex-col gap-3
+      md:absolute md:top-40 md:left-6 md:px-0 md:pb-0 md:pt-0 md:gap-4
+    ">
       {/* Geometry Telemetry */}
-      <div className="bg-[#0c0a08]/80 backdrop-blur-md border border-[#c9a84c]/20 p-6 rounded-lg shadow-2xl w-72">
-        <h2 className="text-[#c9a84c] uppercase tracking-[0.25em] text-[10px] font-medium mb-5 border-b border-[#c9a84c]/10 pb-4">Biometric Stream</h2>
+      <div className="bg-[#0c0a08]/80 backdrop-blur-md border border-[#c9a84c]/20 p-4 md:p-6 rounded-lg shadow-2xl w-full md:w-72">
+        <h2 className="text-[#c9a84c] uppercase tracking-[0.25em] text-[10px] font-medium mb-3 md:mb-5 border-b border-[#c9a84c]/10 pb-3 md:pb-4">Biometric Stream</h2>
         
-        <div className="space-y-5">
+        <div className="space-y-3 md:space-y-5">
           <div className="flex justify-between items-baseline">
             <span className="text-xs text-[#e8d5a3]/40 uppercase tracking-widest">Symmetry</span>
-            <span ref={symmetryRef} className="text-2xl font-mono text-[#e8d5a3] tracking-wider">--.-%</span>
+            <span ref={symmetryRef} className="text-xl md:text-2xl font-mono text-[#e8d5a3] tracking-wider">--.-%</span>
           </div>
           
           <div className="flex justify-between items-baseline">
             <span className="text-xs text-[#e8d5a3]/40 uppercase tracking-widest">Phi Match</span>
-            <span ref={phiScoreRef} className="text-2xl font-mono text-[#c9a84c] tracking-wider">--.-%</span>
+            <span ref={phiScoreRef} className="text-xl md:text-2xl font-mono text-[#c9a84c] tracking-wider">--.-%</span>
           </div>
 
-          <div className="flex justify-between items-center pt-3 border-t border-[#c9a84c]/5">
+          <div className="flex justify-between items-center pt-2 md:pt-3 border-t border-[#c9a84c]/5">
             <span className="text-[10px] text-[#e8d5a3]/30 uppercase tracking-wider">Portrait Ratio</span>
             <span ref={facialRatioRef} className="text-sm font-mono text-[#e8d5a3]/80 tracking-widest">-.---</span>
           </div>
@@ -117,44 +122,47 @@ export default function TelemetryHUD() {
         </div>
       </div>
 
-      {/* 3D Pose Tracker */}
-      <div className="bg-[#0c0a08]/80 backdrop-blur-md border border-[#c9a84c]/20 p-5 rounded-lg shadow-xl w-72 relative overflow-hidden">
-        <h3 className="text-[10px] text-[#c9a84c]/60 uppercase tracking-[0.2em] font-medium mb-4">Pose Matrix</h3>
-        
-        <div className="grid grid-cols-3 gap-3 text-center">
-          <div className="flex flex-col bg-white/5 rounded-sm p-2 border border-white/5">
-            <span className="text-[9px] text-[#e8d5a3]/30 uppercase tracking-widest">Pitch</span>
-            <span ref={pitchRef} className="text-sm font-mono text-[#e8d5a3] mt-1">0.0°</span>
+      {/* Bottom row: Pose + Quality side by side on mobile, stacked on desktop */}
+      <div className="flex gap-3 md:flex-col md:gap-4">
+        {/* 3D Pose Tracker */}
+        <div className="flex-1 bg-[#0c0a08]/80 backdrop-blur-md border border-[#c9a84c]/20 p-3 md:p-5 rounded-lg shadow-xl md:w-72 relative overflow-hidden">
+          <h3 className="text-[10px] text-[#c9a84c]/60 uppercase tracking-[0.2em] font-medium mb-3 md:mb-4">Pose Matrix</h3>
+          
+          <div className="grid grid-cols-3 gap-2 md:gap-3 text-center">
+            <div className="flex flex-col bg-white/5 rounded-sm p-1.5 md:p-2 border border-white/5">
+              <span className="text-[8px] md:text-[9px] text-[#e8d5a3]/30 uppercase tracking-widest">Pitch</span>
+              <span ref={pitchRef} className="text-xs md:text-sm font-mono text-[#e8d5a3] mt-0.5 md:mt-1">0.0°</span>
+            </div>
+            <div className="flex flex-col bg-white/5 rounded-sm p-1.5 md:p-2 border border-white/5">
+              <span className="text-[8px] md:text-[9px] text-[#e8d5a3]/30 uppercase tracking-widest">Yaw</span>
+              <span ref={yawRef} className="text-xs md:text-sm font-mono text-[#e8d5a3] mt-0.5 md:mt-1">0.0°</span>
+            </div>
+            <div className="flex flex-col bg-white/5 rounded-sm p-1.5 md:p-2 border border-white/5">
+              <span className="text-[8px] md:text-[9px] text-[#e8d5a3]/30 uppercase tracking-widest">Roll</span>
+              <span ref={rollRef} className="text-xs md:text-sm font-mono text-[#e8d5a3] mt-0.5 md:mt-1">0.0°</span>
+            </div>
           </div>
-          <div className="flex flex-col bg-white/5 rounded-sm p-2 border border-white/5">
-            <span className="text-[9px] text-[#e8d5a3]/30 uppercase tracking-widest">Yaw</span>
-            <span ref={yawRef} className="text-sm font-mono text-[#e8d5a3] mt-1">0.0°</span>
-          </div>
-          <div className="flex flex-col bg-white/5 rounded-sm p-2 border border-white/5">
-            <span className="text-[9px] text-[#e8d5a3]/30 uppercase tracking-widest">Roll</span>
-            <span ref={rollRef} className="text-sm font-mono text-[#e8d5a3] mt-1">0.0°</span>
+
+          {/* Dynamic Pose Warning Overlay */}
+          <div 
+            ref={poseWarningRef}
+            className="absolute inset-0 bg-[#7f1d1d]/90 backdrop-blur-sm flex items-center justify-center text-white text-xs font-sans tracking-[0.2em] opacity-0 transition-opacity duration-200 border border-red-500/30"
+          >
+            CENTER HEAD
           </div>
         </div>
 
-        {/* Dynamic Pose Warning Overlay */}
-        <div 
-          ref={poseWarningRef}
-          className="absolute inset-0 bg-[#7f1d1d]/90 backdrop-blur-sm flex items-center justify-center text-white text-xs font-sans tracking-[0.2em] opacity-0 transition-opacity duration-200 border border-red-500/30"
-        >
-          CENTER HEAD
-        </div>
-      </div>
-
-      {/* Quality Validator */}
-      <div className="bg-[#0c0a08]/80 backdrop-blur-md border border-[#c9a84c]/20 p-5 rounded-lg shadow-xl w-72">
-        <div className="flex justify-between items-center mb-4">
-          <span className="text-[10px] text-[#c9a84c]/60 uppercase tracking-[0.2em] font-medium">Capture Integrity</span>
-          <span ref={qualityScoreRef} className="text-lg font-mono text-[#e8d5a3]/60 tracking-wider">--/100</span>
-        </div>
-        
-        <div className="flex gap-2">
-          <span ref={blurRef} className="text-[10px] font-sans tracking-widest px-2 py-0.5 rounded-sm border border-white/5 bg-white/5 text-[#e8d5a3]/30">WAIT</span>
-          <span ref={motionRef} className="text-[10px] font-sans tracking-widest px-2 py-0.5 rounded-sm border border-white/5 bg-white/5 text-[#e8d5a3]/30">WAIT</span>
+        {/* Quality Validator */}
+        <div className="flex-1 bg-[#0c0a08]/80 backdrop-blur-md border border-[#c9a84c]/20 p-3 md:p-5 rounded-lg shadow-xl md:w-72">
+          <div className="flex justify-between items-center mb-3 md:mb-4">
+            <span className="text-[10px] text-[#c9a84c]/60 uppercase tracking-[0.2em] font-medium">Capture Integrity</span>
+            <span ref={qualityScoreRef} className="text-base md:text-lg font-mono text-[#e8d5a3]/60 tracking-wider">--/100</span>
+          </div>
+          
+          <div className="flex gap-2">
+            <span ref={blurRef} className="text-[10px] font-sans tracking-widest px-2 py-0.5 rounded-sm border border-white/5 bg-white/5 text-[#e8d5a3]/30">WAIT</span>
+            <span ref={motionRef} className="text-[10px] font-sans tracking-widest px-2 py-0.5 rounded-sm border border-white/5 bg-white/5 text-[#e8d5a3]/30">WAIT</span>
+          </div>
         </div>
       </div>
     </div>

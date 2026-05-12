@@ -1,7 +1,19 @@
 'use client';
-import { useEffect, useRef, useCallback, useMemo } from 'react';
+import { useEffect, useRef, useCallback, useMemo, useState } from 'react';
 import { gsap } from 'gsap';
 import './TargetCursor.css';
+
+function useIsMobile(breakpoint = 768) {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const mql = window.matchMedia(`(max-width: ${breakpoint - 1}px)`);
+    setIsMobile(mql.matches);
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mql.addEventListener('change', handler);
+    return () => mql.removeEventListener('change', handler);
+  }, [breakpoint]);
+  return isMobile;
+}
 
 interface TargetCursorProps {
   targetSelector?: string;
@@ -18,6 +30,7 @@ const TargetCursor = ({
   hoverDuration = 0.2,
   parallaxOn = true,
 }: TargetCursorProps) => {
+  const isMobile = useIsMobile();
   const cursorRef = useRef<HTMLDivElement>(null);
   const cornersRef = useRef<HTMLDivElement>(null);
   
@@ -87,6 +100,8 @@ const TargetCursor = ({
   }, [hoverDuration]);
 
   useEffect(() => {
+    if (isMobile) return; // No cursor logic on mobile
+
     if (hideDefaultCursor) {
       document.body.classList.add('hide-cursor');
     }
@@ -126,7 +141,9 @@ const TargetCursor = ({
       window.removeEventListener('mouseout', handleGlobalOut);
       if (spinTweenRef.current) spinTweenRef.current.kill();
     };
-  }, [targetSelector, hideDefaultCursor, spinDuration, onMouseMove, onMouseEnter, onMouseLeave]);
+  }, [targetSelector, hideDefaultCursor, spinDuration, onMouseMove, onMouseEnter, onMouseLeave, isMobile]);
+
+  if (isMobile) return null;
 
   return (
     <div className="target-cursor-wrapper" ref={cursorRef}>

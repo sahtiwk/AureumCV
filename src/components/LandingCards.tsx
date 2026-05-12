@@ -45,7 +45,7 @@ export default function LandingCards() {
       {/* Gradient transition from hero */}
       <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-[#0a0908] to-transparent z-10 pointer-events-none" />
 
-      <div className="relative z-20 flex flex-col items-center gap-24 px-6 md:px-12 lg:px-20 pt-16">
+      <div className="relative z-20 flex flex-col items-center gap-12 md:gap-24 px-4 md:px-12 lg:px-20 pt-10 md:pt-16">
 
         {/* ─── Scroll hint ─── */}
         <motion.div
@@ -80,7 +80,7 @@ export default function LandingCards() {
 
           <div className="grid md:grid-cols-[5fr_7fr] gap-0">
             {/* Text side */}
-            <div className="p-10 md:p-14 flex flex-col justify-center">
+            <div className="p-6 md:p-14 flex flex-col justify-center">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-10 h-10 rounded-full border border-[#c9a84c]/30 flex items-center justify-center">
                   <Sparkles className="w-5 h-5 text-[#c9a84c]" />
@@ -90,7 +90,7 @@ export default function LandingCards() {
                 </span>
               </div>
 
-              <h3 className="text-4xl md:text-5xl font-display font-light text-[#e8d5a3] mb-2 tracking-wide">
+              <h3 className="text-2xl md:text-5xl font-display font-light text-[#e8d5a3] mb-2 tracking-wide">
                 What is <span className="italic text-[#c9a84c]">Phi</span> (Φ)?
               </h3>
               <p className="text-[#e8d5a3]/40 text-base font-sans leading-relaxed mb-6">
@@ -106,7 +106,7 @@ export default function LandingCards() {
                 </p>
               </div>
 
-              <h4 className="text-2xl font-display font-light text-[#e8d5a3] mb-3 tracking-wide">
+              <h4 className="text-xl md:text-2xl font-display font-light text-[#e8d5a3] mb-3 tracking-wide">
                 The Golden Ratio
               </h4>
               <p className="text-[#e8d5a3]/40 text-sm font-sans leading-relaxed">
@@ -118,8 +118,8 @@ export default function LandingCards() {
             </div>
 
             {/* Image side */}
-            <div className="relative min-h-[420px] md:min-h-0 flex items-center justify-center p-8 md:p-12">
-              <div className="relative w-full h-full min-h-[380px] rounded-xl overflow-hidden border border-[#c9a84c]/10 shadow-[0_0_40px_rgba(201,168,76,0.08)]">
+            <div className="relative min-h-[240px] md:min-h-0 flex items-center justify-center p-4 md:p-12">
+              <div className="relative w-full h-full min-h-[220px] md:min-h-[380px] rounded-xl overflow-hidden border border-[#c9a84c]/10 shadow-[0_0_40px_rgba(201,168,76,0.08)]">
                 <Image
                   src="/golden-ratio.png"
                   alt="Golden Ratio spiral and grid diagram"
@@ -149,8 +149,8 @@ export default function LandingCards() {
 
           <div className="grid md:grid-cols-[7fr_5fr] gap-0">
             {/* Image side (left on this card for visual rhythm) */}
-            <div className="relative min-h-[420px] md:min-h-0 flex items-center justify-center p-8 md:p-12 order-2 md:order-1">
-              <div className="relative w-full h-full min-h-[380px] rounded-xl overflow-hidden border border-[#c9a84c]/10 shadow-[0_0_40px_rgba(201,168,76,0.08)]">
+            <div className="relative min-h-[240px] md:min-h-0 flex items-center justify-center p-4 md:p-12 order-2 md:order-1">
+              <div className="relative w-full h-full min-h-[220px] md:min-h-[380px] rounded-xl overflow-hidden border border-[#c9a84c]/10 shadow-[0_0_40px_rgba(201,168,76,0.08)]">
                 <Image
                   src="/portrait-ocular.png"
                   alt="Portrait ratio and ocular spacing diagram"
@@ -163,7 +163,7 @@ export default function LandingCards() {
             </div>
 
             {/* Text side */}
-            <div className="p-10 md:p-14 flex flex-col justify-center order-1 md:order-2">
+            <div className="p-6 md:p-14 flex flex-col justify-center order-1 md:order-2">
               <div className="flex items-center gap-3 mb-8">
                 <div className="w-10 h-10 rounded-full border border-[#c9a84c]/30 flex items-center justify-center">
                   <Ratio className="w-5 h-5 text-[#c9a84c]" />
@@ -173,7 +173,7 @@ export default function LandingCards() {
                 </span>
               </div>
 
-              <h3 className="text-4xl md:text-5xl font-display font-light text-[#e8d5a3] mb-6 tracking-wide">
+              <h3 className="text-2xl md:text-5xl font-display font-light text-[#e8d5a3] mb-4 md:mb-6 tracking-wide">
                 Portrait Ratio
               </h3>
               <p className="text-[#e8d5a3]/40 text-sm font-sans leading-relaxed mb-8">
@@ -195,7 +195,7 @@ export default function LandingCards() {
                 </span>
               </div>
 
-              <h3 className="text-4xl md:text-5xl font-display font-light text-[#e8d5a3] mb-6 tracking-wide">
+              <h3 className="text-2xl md:text-5xl font-display font-light text-[#e8d5a3] mb-4 md:mb-6 tracking-wide">
                 Ocular Spacing
               </h3>
               <p className="text-[#e8d5a3]/40 text-sm font-sans leading-relaxed">
@@ -227,7 +227,7 @@ export default function LandingCards() {
 
           <div className="grid md:grid-cols-[5fr_7fr] gap-0">
             {/* Text side */}
-            <div className="p-10 md:p-14 flex flex-col justify-center">
+            <div className="p-6 md:p-14 flex flex-col justify-center">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-10 h-10 rounded-full border border-[#c9a84c]/30 flex items-center justify-center">
                   <Box className="w-5 h-5 text-[#c9a84c]" />
@@ -237,7 +237,7 @@ export default function LandingCards() {
                 </span>
               </div>
 
-              <h3 className="text-4xl md:text-5xl font-display font-light text-[#e8d5a3] mb-6 tracking-wide">
+              <h3 className="text-2xl md:text-5xl font-display font-light text-[#e8d5a3] mb-4 md:mb-6 tracking-wide">
                 Pose Matrix
               </h3>
               <p className="text-[#e8d5a3]/40 text-sm font-sans leading-relaxed mb-8">
@@ -296,8 +296,8 @@ export default function LandingCards() {
             </div>
 
             {/* Image side */}
-            <div className="relative min-h-[420px] md:min-h-0 flex items-center justify-center p-8 md:p-12">
-              <div className="relative w-full h-full min-h-[380px] rounded-xl overflow-hidden border border-[#c9a84c]/10 shadow-[0_0_40px_rgba(201,168,76,0.08)]">
+            <div className="relative min-h-[240px] md:min-h-0 flex items-center justify-center p-4 md:p-12">
+              <div className="relative w-full h-full min-h-[220px] md:min-h-[380px] rounded-xl overflow-hidden border border-[#c9a84c]/10 shadow-[0_0_40px_rgba(201,168,76,0.08)]">
                 <Image
                   src="/pose-matrix.png"
                   alt="3D Pose Matrix: Pitch, Yaw, Roll axes on a head model"

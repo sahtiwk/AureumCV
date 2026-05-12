@@ -71,7 +71,7 @@ export default function ImageUploader() {
       {/* Back Button */}
       <button
         onClick={() => setAppState('IDLE')}
-        className="absolute top-7 left-7 flex items-center gap-3 text-[#e8d5a3]/60 hover:text-[#e8d5a3] transition-colors duration-300 z-10"
+        className="absolute top-4 left-4 md:top-7 md:left-7 flex items-center gap-2 md:gap-3 text-[#e8d5a3]/60 hover:text-[#e8d5a3] transition-colors duration-300 z-10"
         style={{ fontFamily: 'var(--font-sans)' }}
       >
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -81,7 +81,7 @@ export default function ImageUploader() {
       </button>
 
       {/* Center Drop Zone */}
-      <div className="flex-1 flex items-center justify-center px-16">
+      <div className="flex-1 flex items-center justify-center px-4 md:px-16">
         <motion.div
           onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
           onDragLeave={() => setIsDragging(false)}
@@ -151,7 +151,7 @@ export default function ImageUploader() {
                   className="flex flex-col items-center gap-4"
                 >
                   <h2
-                    className="text-5xl font-light"
+                    className="text-3xl md:text-5xl font-light"
                     style={{
                       fontFamily: 'var(--font-display)',
                       color: isDragging ? '#e8d5a3' : '#d4bc8a',
@@ -193,7 +193,7 @@ export default function ImageUploader() {
       </div>
 
       {/* Footer */}
-      <footer className="pb-8 flex items-end justify-between px-7">
+      <footer className="pb-6 md:pb-8 flex items-end justify-between px-4 md:px-7">
         {/* Brand mark */}
         <div
           className="w-8 h-8 rounded-full flex items-center justify-center"
