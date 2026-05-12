@@ -92,11 +92,7 @@ Analyzes facial height-to-width ratios and inter-eye spacing against the Golden 
 
 ## 🚢 Deployment (Vercel)
 
-AureumCV is optimized for Vercel. Ensure the following:
-
-- **Build Command**: `next build`
-- **Output Directory**: `.next`
-- **WASM Support**: Ensure `.wasm` files are served correctly from the `public` directory.
+AureumCV is optimized for Vercel. You can find the deployment here: [Live Demo](https://aureum-cv.vercel.app)
 
 ---
 
