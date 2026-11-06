@@ -44,8 +44,8 @@
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/symmetry-pro.git
-   cd symmetry-pro
+   git clone https://github.com/your-username/aureumcv.git
+   cd aureumcv
    ```
 
 2. Install dependencies:
@@ -110,7 +110,9 @@ Analyzes facial height-to-width ratios and inter-eye spacing against the Golden 
 
 ## 🚢 Deployment (Vercel)
 
-AureumCV is optimized for Vercel. Ensure the following:
+AureumCV is optimized for Vercel. You can find the deployment here: [Live Demo](https://aureum-cv.vercel.app)
+
+Ensure the following:
 
 - **Build Command**: `npm run build` (includes the WASM artifact check)
 - **Output Directory**: `.next`
