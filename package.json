@@ -3,6 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "build:wasm": "node scripts/build-wasm.mjs",
+    "check:wasm": "node scripts/check-wasm.mjs",
+    "test:wasm": "node --test tests/geometry-wasm.test.mjs",
+    "test:logging": "node --test tests/mediapipe-logging.test.mjs",
+    "predev": "npm run check:wasm",
+    "prebuild": "npm run check:wasm",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",

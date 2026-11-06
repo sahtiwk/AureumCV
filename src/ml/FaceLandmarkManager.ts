@@ -1,8 +1,9 @@
 import { FaceLandmarker, FilesetResolver } from '@mediapipe/tasks-vision';
 import { FaceAnalysisResult, Landmark } from '@/types';
-import { GeometryEngine } from '@/geometry/GeometryEngine';
+import { WasmGeometryEngine } from '@/geometry/WasmGeometryEngine';
 import { QualityAssessor } from './QualityAssessor';
 import { TemporalSmoother } from './TemporalSmoother';
+import { withMediaPipeLogging } from './MediaPipeLogging';
 
 // Internal type for raw MediaPipe output
 type RawLandmark = { x: number; y: number; z: number; visibility?: number };
@@ -13,6 +14,7 @@ export class FaceLandmarkManager {
   private static isInitializing = false;
 
   public static async getInstance(): Promise<FaceLandmarker> {
+    await WasmGeometryEngine.init();
     if (this.instance) return this.instance;
     if (this.isInitializing) {
       // Wait for initialization to complete if already requested
@@ -32,7 +34,7 @@ export class FaceLandmarkManager {
         "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm"
       );
 
-      this.instance = await FaceLandmarker.createFromOptions(vision, {
+      this.instance = await withMediaPipeLogging(() => FaceLandmarker.createFromOptions(vision, {
         baseOptions: {
           modelAssetPath: "/models/face_landmarker.task",
           delegate: "GPU"
@@ -40,7 +42,7 @@ export class FaceLandmarkManager {
         outputFaceBlendshapes: false,
         runningMode: "VIDEO",
         numFaces: 1
-      });
+      }));
       
       this.isInitializing = false;
       return this.instance;
@@ -58,17 +60,8 @@ export class FaceLandmarkManager {
   public static detectRawLandmarks(videoElement: HTMLVideoElement, timestamp: number): Landmark[] | null {
     if (!this.instance) return null;
 
-    const originalConsoleError = console.error;
-    console.error = (...args: any[]) => {
-      if (typeof args[0] === 'string' && (args[0].includes('XNNPACK') || args[0].includes('gl_context') || args[0].includes('FaceBlendshapesGraph'))) {
-        return;
-      }
-      originalConsoleError.apply(console, args);
-    };
-
     try {
       const result = this.instance.detectForVideo(videoElement, timestamp);
-      console.error = originalConsoleError;
 
       if (result?.faceLandmarks?.length > 0) {
         return result.faceLandmarks[0].map((pt: RawLandmark) => ({
@@ -79,11 +72,9 @@ export class FaceLandmarkManager {
         }));
       }
     } catch (e) {
-      console.error = originalConsoleError;
       console.warn('Detection error:', e);
     }
 
-    console.error = originalConsoleError;
     return null;
   }
 
@@ -95,7 +86,7 @@ export class FaceLandmarkManager {
     if (!rawPoints) return null;
 
     const landmarks = TemporalSmoother.smooth(rawPoints);
-    const phiMetrics = GeometryEngine.analyze(landmarks) || undefined;
+    const phiMetrics = WasmGeometryEngine.analyze(landmarks) || undefined;
     const qualityMetrics = QualityAssessor.assess(videoElement, landmarks);
 
     return { landmarks, phiMetrics, qualityMetrics };
@@ -106,12 +97,13 @@ export class FaceLandmarkManager {
    * Uses a separate IMAGE-mode FaceLandmarker to avoid breaking the live VIDEO-mode instance.
    */
   public static async detectImage(imageElement: HTMLImageElement): Promise<FaceAnalysisResult | null> {
+    await WasmGeometryEngine.init();
     // Lazily create a dedicated IMAGE-mode instance
     if (!this.imageInstance) {
       const vision = await FilesetResolver.forVisionTasks(
         'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm'
       );
-      this.imageInstance = await FaceLandmarker.createFromOptions(vision, {
+      this.imageInstance = await withMediaPipeLogging(() => FaceLandmarker.createFromOptions(vision, {
         baseOptions: {
           modelAssetPath: '/models/face_landmarker.task',
           delegate: 'GPU',
@@ -119,7 +111,7 @@ export class FaceLandmarkManager {
         outputFaceBlendshapes: false,
         runningMode: 'IMAGE', // <-- Static image mode
         numFaces: 1,
-      });
+      }));
     }
 
     try {
@@ -134,7 +126,7 @@ export class FaceLandmarkManager {
         }));
 
         // No temporal smoothing for static images (single frame)
-        const phiMetrics = GeometryEngine.analyze(rawPoints) || undefined;
+        const phiMetrics = WasmGeometryEngine.analyze(rawPoints) || undefined;
         const qualityMetrics = QualityAssessor.assessStatic(rawPoints);
 
         return { landmarks: rawPoints, phiMetrics, qualityMetrics };

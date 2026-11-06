@@ -1,6 +1,5 @@
 #include <emscripten/emscripten.h>
 #include <cmath>
-#include <vector>
 #include <algorithm>
 
 using namespace std;
@@ -23,12 +22,15 @@ extern "C" {
   float* analyzeFace(float* flattenedLandmarks, int numFloats) {
       static float results[4]; 
       
-      if (numFloats < 1434) {
+      if (!flattenedLandmarks || numFloats != 1434) {
           results[0] = -1;
           return results;
       }
 
       Point pts[478];
+      // All metrics below are ratios of Euclidean distances. Translation,
+      // rigid rotation and uniform scaling cancel, so no pose normalization
+      // is needed here to match GeometryEngine's normalized-distance ratios.
       for(int i=0; i<478; i++) {
           pts[i].x = flattenedLandmarks[i*3];
           pts[i].y = flattenedLandmarks[i*3 + 1];
