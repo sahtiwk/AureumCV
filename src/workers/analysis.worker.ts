@@ -26,19 +26,17 @@ export interface WorkerOutput {
   result: FaceAnalysisResult | null;
 }
 
-const geometryReady = WasmGeometryEngine.init();
-
 self.onmessage = async (event: MessageEvent<WorkerInput>) => {
   const { type, rawLandmarks, imageBitmap } = event.data;
 
   if (type !== 'ANALYZE') return;
 
   try {
-    await geometryReady;
+    await WasmGeometryEngine.init();
     // Step 1: Temporal smoothing (eliminates micro-jitter)
     const landmarks = TemporalSmoother.smooth(rawLandmarks);
 
-    // Step 2: C++ geometry + Phi computations, with a TypeScript fallback
+    // Step 2: C++ geometry + Phi computations
     const phiMetrics = WasmGeometryEngine.analyze(landmarks) || undefined;
 
     // Step 3: Quality scoring using the transferred ImageBitmap

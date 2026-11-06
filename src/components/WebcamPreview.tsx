@@ -31,7 +31,14 @@ export default function WebcamPreview() {
             lastVideoTimeRef.current = video.currentTime;
 
             const startTimeMs = performance.now();
-            const result = FaceLandmarkManager.detectVideo(video, startTimeMs);
+            let result;
+            try {
+              result = FaceLandmarkManager.detectVideo(video, startTimeMs);
+            } catch (error) {
+              setCurrentFaceResult(null);
+              setError(error instanceof Error ? error.message : 'Analysis failed. Please reload and try again.');
+              return;
+            }
 
             if (result) {
               setCurrentFaceResult(result);
@@ -50,7 +57,7 @@ export default function WebcamPreview() {
         requestRef.current = requestAnimationFrame(predictWebcam);
       } catch (err) {
         console.error('Error loading model:', err);
-        setError('Failed to load Face Landmarker model.');
+        setError(err instanceof Error ? err.message : 'Failed to initialize analysis.');
       }
     };
 

@@ -6,37 +6,42 @@ import { join } from 'node:path';
 import { createRequire } from 'node:module';
 import ts from 'typescript';
 
+// Compile only the browser bridge for these Node tests, not a math implementation.
 const directory = mkdtempSync(join(tmpdir(), 'aureum-wasm-test-'));
 const require = createRequire(import.meta.url);
-for (const name of ['PoseEstimator', 'GeometryEngine', 'WasmGeometryEngine']) {
-  const source = readFileSync(new URL(`../src/geometry/${name}.ts`, import.meta.url), 'utf8');
-  writeFileSync(join(directory, `${name}.js`), ts.transpileModule(source, {
-    compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
-  }).outputText);
-}
-const { GeometryEngine } = require(join(directory, 'GeometryEngine.js'));
-const { WasmGeometryEngine: engine } = require(join(directory, 'WasmGeometryEngine.js'));
+const enginePath = join(directory, 'WasmGeometryEngine.js');
+writeFileSync(enginePath, ts.transpileModule(
+  readFileSync(new URL('../src/geometry/WasmGeometryEngine.ts', import.meta.url), 'utf8'),
+  { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } },
+).outputText);
+const { WasmGeometryEngine: engine } = require(enginePath);
 const bytes = readFileSync(new URL('../public/wasm/geometry.wasm', import.meta.url));
 const originalFetch = globalThis.fetch;
 test.after(() => { globalThis.fetch = originalFetch; rmSync(directory, { recursive: true }); });
 
-let seed = 42;
-const random = () => ((seed = (Math.imul(1664525, seed) + 1013904223) >>> 0) / 2 ** 32);
-const face = () => Array.from({ length: 478 }, () => ({ x: random(), y: random(), z: random() - 0.5 }));
-const compare = points => {
+const face = () => {
+  const points = Array.from({ length: 478 }, () => ({ x: 0, y: 0, z: 0 }));
+  points[10].y = -1.618;
+  points[152].y = 1.618;
+  points[234].x = -1;
+  points[454].x = 1;
+  points[33].x = -0.75;
+  points[133].x = -0.25;
+  points[362].x = 0.25;
+  points[263].x = 0.75;
+  return points;
+};
+const checkKnownMetrics = points => {
   const actual = engine.analyze(points);
-  const expected = GeometryEngine.analyze(points);
-  for (const key of Object.keys(expected)) {
-    assert.ok(Math.abs(actual[key] - expected[key]) <= 0.0002 * Math.max(1, Math.abs(expected[key])),
-      `${key}: WASM ${actual[key]}, TypeScript ${expected[key]}`);
-  }
+  const expected = { facialRatio: 1.618, eyeSpacingRatio: 1, symmetryScore: 100, phiScore: 100 };
+  for (const [key, value] of Object.entries(expected)) assert.ok(Math.abs(actual[key] - value) < 0.0002, key);
 };
 
-test('missing binary falls back; a later initialization retries and shares concurrent requests', async () => {
+test('missing binary rejects analysis; initialization can retry and shares concurrent requests', async () => {
   globalThis.fetch = async () => new Response('missing', { status: 404 });
-  await engine.init();
-  assert.equal(engine.backend, 'typescript');
-  compare(face());
+  await assert.rejects(engine.init(), /C\+\+ analysis engine could not load/);
+  assert.equal(engine.backend, 'unavailable');
+  assert.throws(() => engine.analyze(face()), /not ready/);
   let requests = 0;
   globalThis.fetch = async url => {
     assert.equal(url, '/wasm/geometry.wasm');
@@ -48,18 +53,24 @@ test('missing binary falls back; a later initialization retries and shares concu
   assert.equal(engine.backend, 'wasm');
 });
 
-test('real C++ WASM matches TypeScript on 1000 deterministic landmark sets', () => {
-  assert.equal(engine.backend, 'wasm');
-  for (let i = 0; i < 1000; i++) compare(face());
-  assert.equal(engine.backend, 'wasm'); // A fallback must not disguise a failed WASM test.
+test('C++ metrics match known geometry across rotations, translations and scales', () => {
+  checkKnownMetrics(face());
+  for (let i = 1; i <= 1000; i++) {
+    const angle = i * 0.01;
+    const scale = 0.1 + i / 100;
+    checkKnownMetrics(face().map(({x,y,z}) => ({
+      x: (x * Math.cos(angle) - y * Math.sin(angle)) * scale + 0.5,
+      y: (x * Math.sin(angle) + y * Math.cos(angle)) * scale - 0.2,
+      z: z * scale + 0.1,
+    })));
+  }
 });
 
 test('degenerate and malformed inputs are handled', () => {
-  compare(Array.from({ length: 478 }, () => ({ x: 0, y: 0, z: 0 })));
-  const points = face();
-  points[454] = { ...points[234] };
-  compare(points);
+  assert.deepEqual(engine.analyze(Array.from({ length: 478 }, () => ({ x: 0, y: 0, z: 0 }))),
+    { facialRatio: 0, eyeSpacingRatio: 0, symmetryScore: 100, phiScore: 0 });
   assert.equal(engine.analyze([]), null);
+  const points = face();
   points[1].x = NaN;
   assert.equal(engine.analyze(points), null);
   points[1].x = Infinity;
@@ -69,7 +80,6 @@ test('degenerate and malformed inputs are handled', () => {
 test('repeated analysis releases input allocations', () => {
   const points = face();
   for (let i = 0; i < 10000; i++) assert.ok(engine.analyze(points));
-  // Leaking 5736 bytes per frame would exhaust the fixed WASM memory here.
   assert.equal(engine.backend, 'wasm');
 });
 
@@ -85,7 +95,7 @@ test('standalone binary runs in a worker without DOM or imports', async () => {
         const metrics = WasmGeometryEngine.analyze(workerData.points);
         parentPort.postMessage({ backend: WasmGeometryEngine.backend, metrics });
       })().catch(error => { throw error; });
-    `, { eval: true, workerData: { bytes, enginePath: join(directory, 'WasmGeometryEngine.js'), points: face() } });
+    `, { eval: true, workerData: { bytes, enginePath, points: face() } });
     worker.once('message', resolve);
     worker.once('error', reject);
     worker.once('exit', code => { if (code) reject(new Error(`Worker exited ${code}`)); });
@@ -94,8 +104,7 @@ test('standalone binary runs in a worker without DOM or imports', async () => {
   assert.ok(Number.isFinite(result.metrics.phiScore));
 });
 
-test('a WASM runtime exception frees the allocation and falls back', async () => {
-  const enginePath = join(directory, 'WasmGeometryEngine.js');
+test('runtime failure frees memory and rejects instead of switching engines', async () => {
   delete require.cache[enginePath];
   const { WasmGeometryEngine: failingEngine } = require(enginePath);
   const instantiate = WebAssembly.instantiate;
@@ -110,10 +119,8 @@ test('a WASM runtime exception frees the allocation and falls back', async () =>
   };
   try {
     await failingEngine.init();
-    assert.equal(failingEngine.backend, 'wasm');
-    const points = face();
-    assert.deepEqual(failingEngine.analyze(points), GeometryEngine.analyze(points));
-    assert.equal(failingEngine.backend, 'typescript');
+    assert.throws(() => failingEngine.analyze(face()), /C\+\+ analysis engine failed/);
+    assert.equal(failingEngine.backend, 'unavailable');
     assert.equal(frees, 1);
   } finally {
     WebAssembly.instantiate = instantiate;

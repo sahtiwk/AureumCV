@@ -135,7 +135,7 @@ export class FaceLandmarkManager {
       return null; // No face detected
     } catch (e) {
       console.warn('[detectImage] Error:', e);
-      return null;
+      throw e;
     }
   }
 }

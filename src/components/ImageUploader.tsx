@@ -5,7 +5,7 @@ import { FaceLandmarkManager } from '@/ml/FaceLandmarkManager';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function ImageUploader() {
-  const { setAppState, setUploadedImage, setCurrentAnalysis, setCurrentFaceResult } = useAppStore();
+  const { setAppState, setUploadedImage, setCurrentAnalysis, setCurrentFaceResult, setError } = useAppStore();
   const [isDragging, setIsDragging] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [noFaceError, setNoFaceError] = useState(false);
@@ -45,13 +45,14 @@ export default function ImageUploader() {
         } catch (err) {
           console.error('[ImageUploader] Analysis failed:', err);
           setIsProcessing(false);
-          setNoFaceError(true);
-          setAppState('UPLOAD_IDLE');
+          setUploadedImage(null);
+          setCurrentFaceResult(null);
+          setError(err instanceof Error ? err.message : 'Analysis failed. Please reload and try again.');
         }
       };
     };
     reader.readAsDataURL(file);
-  }, [setAppState, setUploadedImage, setCurrentAnalysis, setCurrentFaceResult]);
+  }, [setAppState, setUploadedImage, setCurrentAnalysis, setCurrentFaceResult, setError]);
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();

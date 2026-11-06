@@ -1,5 +1,4 @@
 import type { Landmark, PhiMetrics } from '@/types';
-import { GeometryEngine } from './GeometryEngine';
 
 interface GeometryExports extends WebAssembly.Exports {
   memory: WebAssembly.Memory;
@@ -9,12 +8,12 @@ interface GeometryExports extends WebAssembly.Exports {
   _initialize(): void;
 }
 
-/** C++ metrics with a TypeScript fallback for environments without WASM. */
+/** Browser bridge to the C++ metrics engine. No alternative math implementation. */
 export class WasmGeometryEngine {
   private static module: GeometryExports | null = null;
   private static initPromise: Promise<void> | null = null;
-  public static get backend(): 'wasm' | 'typescript' {
-    return this.module ? 'wasm' : 'typescript';
+  public static get backend(): 'wasm' | 'unavailable' {
+    return this.module ? 'wasm' : 'unavailable';
   }
 
   public static init(): Promise<void> {
@@ -36,7 +35,7 @@ export class WasmGeometryEngine {
         this.module = exports;
         console.info('[geometry] C++ WebAssembly engine ready');
       } catch (error) {
-        console.warn('[geometry] WASM unavailable; using TypeScript fallback.', error);
+        throw new Error('The C++ analysis engine could not load. Please reload and try again.', { cause: error });
       }
     })().finally(() => { this.initPromise = null; });
     return this.initPromise;
@@ -46,7 +45,7 @@ export class WasmGeometryEngine {
     if (landmarks.length !== 478 || landmarks.some(p =>
       !Number.isFinite(p.x) || !Number.isFinite(p.y) || !Number.isFinite(p.z))) return null;
     const wasm = this.module;
-    if (!wasm) return GeometryEngine.analyze(landmarks);
+    if (!wasm) throw new Error('The C++ analysis engine is not ready. Please reload and try again.');
     let pointer = 0;
     try {
       pointer = wasm.malloc(478 * 3 * 4);
@@ -66,8 +65,7 @@ export class WasmGeometryEngine {
       return { facialRatio, eyeSpacingRatio, symmetryScore, phiScore };
     } catch (error) {
       this.module = null;
-      console.warn('[geometry] WASM failed; using TypeScript fallback.', error);
-      return GeometryEngine.analyze(landmarks);
+      throw new Error('The C++ analysis engine failed. Please reload and try again.', { cause: error });
     } finally {
       if (pointer) wasm.free(pointer);
     }

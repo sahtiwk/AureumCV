@@ -30,7 +30,7 @@ extern "C" {
       Point pts[478];
       // All metrics below are ratios of Euclidean distances. Translation,
       // rigid rotation and uniform scaling cancel, so no pose normalization
-      // is needed here to match GeometryEngine's normalized-distance ratios.
+      // is needed to compute these normalized-distance ratios.
       for(int i=0; i<478; i++) {
           pts[i].x = flattenedLandmarks[i*3];
           pts[i].y = flattenedLandmarks[i*3 + 1];
